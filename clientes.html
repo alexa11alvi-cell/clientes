@@ -1,0 +1,212 @@
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Clientes - CRUD</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f4f6f9;
+    margin:0;
+}
+
+.header{
+    background:#4a86cf;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+}
+
+.container{
+    display:flex;
+    gap:30px;
+    padding:30px;
+}
+
+.form-box{
+    width:250px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+.form-box input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+.form-box button{
+    width:100%;
+    padding:12px;
+    background:#2fa4e7;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+/* TABLA */
+.table-box{
+    flex:1;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+
+th{
+    background:#eee;
+}
+
+.edit{
+    background:green;
+    color:white;
+    border:none;
+    padding:5px 10px;
+    cursor:pointer;
+}
+
+.delete{
+    background:red;
+    color:white;
+    border:none;
+    padding:5px 10px;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header"> Módulo Clientes (CRUD)</div>
+
+<div class="container">
+
+<div class="form-box">
+
+<input id="dni" placeholder="👤 DNI">
+<input id="nombre" placeholder="👤 Nombre">
+<input id="direccion" placeholder="🏠 Dirección">
+
+<button onclick="guardar()">Agregar</button>
+
+</div>
+
+<div class="table-box">
+
+<table>
+<thead>
+<tr>
+<th>OPC</th>
+<th>DNI</th>
+<th>NOMBRE</th>
+<th>DIR</th>
+</tr>
+</thead>
+
+<tbody id="tablaClientes"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+let clientes = [
+{dni:"10293847",nombre:"Carlos Mendoza Ruiz",dir:"Av. Los Próceres 123"},
+{dni:"12121212",nombre:"Beatriz Rivas Marín",dir:"Jr. Ayacucho 442"},
+{dni:"143434312",nombre:"julian sanches",dir:"Jr. la libertad 442"},
+{dni:"13131313",nombre:"alexa alvizuri ",dir:"Av. Larco 110"}
+];
+
+let editIndex = -1;
+
+function mostrar(){
+    let tabla="";
+    clientes.forEach((c,i)=>{
+        tabla+=`
+        <tr>
+        <td>
+            <button class="edit" onclick="editar(${i})">Edi</button>
+            <button class="delete" onclick="eliminar(${i})">Elim</button>
+        </td>
+        <td>${c.dni}</td>
+        <td>${c.nombre}</td>
+        <td>${c.dir}</td>
+        </tr>
+        `;
+    });
+    document.getElementById("tablaClientes").innerHTML=tabla;
+}
+
+
+function guardar(){
+
+    let dni=document.getElementById("dni").value;
+    let nombre=document.getElementById("nombre").value;
+    let dir=document.getElementById("direccion").value;
+
+    if(dni==""||nombre==""||dir==""){
+        alert("Complete datos");
+        return;
+    }
+
+    if(editIndex==-1){
+        clientes.push({dni,nombre,dir});
+    }else{
+        clientes[editIndex]={dni,nombre,dir};
+        editIndex=-1;
+    }
+
+    limpiar();
+    mostrar();
+}
+
+function editar(i){
+    let c=clientes[i];
+
+    document.getElementById("dni").value=c.dni;
+    document.getElementById("nombre").value=c.nombre;
+    document.getElementById("direccion").value=c.dir;
+
+    editIndex=i;
+}
+
+function eliminar(i){
+    clientes.splice(i,1);
+    mostrar();
+}
+
+function limpiar(){
+    dni.value="";
+    nombre.value="";
+    direccion.value="";
+}
+
+mostrar();
+
+</script>
+
+</body>
+</html>
