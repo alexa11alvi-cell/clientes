@@ -1,211 +1,554 @@
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Clientes - CRUD</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clientes - Sistema de Registro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-<style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
 
-body{
-    font-family:Arial;
-    background:#f4f6f9;
-    margin:0;
-}
+    .header {
+      color: white;
+      font-size: 28px;
+      margin: 30px 0 40px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
 
-.header{
-    background:#4a86cf;
-    color:white;
-    padding:15px;
-    text-align:center;
-    font-size:22px;
-}
+    /* Panel login / registro */
+    .container {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease-out;
+    }
 
-.container{
-    display:flex;
-    gap:30px;
-    padding:30px;
-}
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-.form-box{
-    width:250px;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.2);
-}
+    .login_register_container {
+      display: flex;
+      justify-content: space-between;
+      height: 60px;
+      background: #2f496e;
+    }
 
-.form-box input{
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border-radius:6px;
-    border:1px solid #ccc;
-}
+    .login_register_container button {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #ddd;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
 
-.form-box button{
-    width:100%;
-    padding:12px;
-    background:#2fa4e7;
-    color:white;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-}
+    .login_register_container button.active {
+      color: white;
+      font-weight: 600;
+    }
 
-/* TABLA */
-.table-box{
-    flex:1;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.2);
-}
+    .login_register_container button.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      width: 80%;
+      height: 3px;
+      background: #2fa4e7;
+      border-radius: 2px;
+    }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-}
+    .login_register_container button:hover {
+      color: #fff;
+    }
 
-th,td{
-    border:1px solid #ccc;
-    padding:8px;
-    text-align:center;
-}
+    .form_wrapper {
+      padding: 30px 40px 40px;
+      transform: translateX(0);
+      transition: transform 0.5s ease;
+    }
 
-th{
-    background:#eee;
-}
+    .login_form {
+      transform: translateX(0);
+    }
 
-.edit{
-    background:green;
-    color:white;
-    border:none;
-    padding:5px 10px;
-    cursor:pointer;
-}
+    .register_form {
+      transform: translateX(110%);
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      padding: 30px 40px 40px;
+      background: rgba(255, 255, 255, 0.95);
+    }
 
-.delete{
-    background:red;
-    color:white;
-    border:none;
-    padding:5px 10px;
-    cursor:pointer;
-}
+    .login_form.hidden,
+    .register_form.hidden {
+      display: none;
+    }
 
-</style>
+    .login_form.visible,
+    .register_form.visible {
+      display: block;
+    }
+
+    .login_form h2,
+    .register_form h2 {
+      margin-bottom: 20px;
+      color: #2f496e;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .login_register_container p {
+      margin-top: 10px;
+      color: #666;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .login_register_container p a {
+      color: #2fa4e7;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login_register_container p a:hover {
+      text-decoration: underline;
+    }
+
+    .input_group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input_group input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .input_group input:focus {
+      border-color: #2fa4e7;
+      box-shadow: 0 0 10px rgba(47, 164, 231, 0.2);
+    }
+
+    .input_group i {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #888;
+    }
+
+    .btn_login {
+      width: 100%;
+      padding: 12px;
+      background: #2fa4e7;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn_login:hover {
+      background: #2a94d6;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(47, 164, 231, 0.3);
+    }
+
+    /* Módulo clientes CRUD */
+    .clients_wrapper {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .crud_header {
+      background: #2f496e;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px 10px 0 0;
+      font-size: 18px;
+    }
+
+    .crud_container {
+      display: flex;
+      gap: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-box {
+      width: 280px;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #eaeaea;
+    }
+
+    .form-box input {
+      width: 100%;
+      padding: 12px 10px;
+      margin: 8px 0 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      outline: none;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-box input:focus {
+      border-color: #2fa4e7;
+    }
+
+    .form-box label {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+      color: #444;
+      font-weight: 500;
+    }
+
+    .form-box button {
+      width: 100%;
+      padding: 12px;
+      background: #2fa4e7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-box button:hover {
+      background: #2a94d6;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 15px rgba(47, 164, 231, 0.3);
+    }
+
+    .form-box button#btn_cancel {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+
+    .form-box button#btn_cancel:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+
+    .table-box {
+      flex: 1;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid #eaeaea;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+
+    th,
+    td {
+      padding: 10px 8px;
+      text-align: center;
+      border: none;
+    }
+
+    th {
+      background: #2f496e;
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    tbody tr {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    tbody tr:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .edit {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .edit:hover {
+      background: #1e7e34;
+    }
+
+    .delete {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .delete:hover {
+      background: #c82333;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="header">Sistema de Gestión de Clientes</div>
 
-<div class="header"> Módulo Clientes (CRUD)</div>
+  <!-- LOGIN / REGISTRO -->
+  <div class="container">
+    <div class="login_register_container">
+      <button id="btn_login_tab" class="active">Iniciar Sesión</button>
+      <button id="btn_register_tab">Registrarse</button>
+    </div>
 
-<div class="container">
+    <!-- Formulario de Inicio de Sesión -->
+    <div class="form_wrapper login_form visible">
+      <h2>Bienvenido</h2>
+      <form id="loginForm">
+        <div class="input_group">
+          <input type="text" placeholder="Usuario" id="login_user" required />
+          <i>👤</i>
+        </div>
+        <div class="input_group">
+          <input type="password" placeholder="Contraseña" id="login_pass" required />
+          <i>🔒</i>
+        </div>
+        <button type="submit" class="btn_login">Entrar</button>
+      </form>
+      <p>
+        ¿No tienes cuenta?
+        <a href="#" onclick="showRegister()">Regístrate aquí</a>
+      </p>
+    </div>
 
-<div class="form-box">
+    <!-- Formulario de Registro -->
+    <div class="form_wrapper register_form hidden">
+      <h2>Crear cuenta</h2>
+      <form id="registerForm">
+        <div class="input_group">
+          <input type="text" placeholder="Nombre completo" id="reg_name" required />
+          <i>👤</i>
+        </div>
+        <div class="input_group">
+          <input type="email" placeholder="Correo electrónico" id="reg_email" required />
+          <i>📧</i>
+        </div>
+        <div class="input_group">
+          <input type="password" placeholder="Contraseña" id="reg_pass" required />
+          <i>🔒</i>
+        </div>
+        <button type="submit" class="btn_login">Registrar</button>
+      </form>
+      <p>
+        ¿Ya tienes cuenta?
+        <a href="#" onclick="showLogin()">Iniciar sesión</a>
+      </p>
+    </div>
+  </div>
 
-<input id="dni" placeholder="👤 DNI">
-<input id="nombre" placeholder="👤 Nombre">
-<input id="direccion" placeholder="🏠 Dirección">
+  <!-- Módulo CLIENTES CRUD -->
+  <div class="clients_wrapper" id="clientsSection" style="display:none;">
+    <div class="crud_header">Módulo Clientes (CRUD)</div>
+    <div class="crud_container">
+      <div class="form-box">
+        <label for="dni">DNI</label>
+        <input id="dni" placeholder="DNI del cliente" />
+        <label for="nombre">Nombre</label>
+        <input id="nombre" placeholder="Nombre completo" />
+        <label for="direccion">Dirección</label>
+        <input id="direccion" placeholder="Dirección" />
 
-<button onclick="guardar()">Agregar</button>
+        <button onclick="guardar()">Agregar cliente</button>
+        <button id="btn_cancel" onclick="cancelarEdicion()">Cancelar</button>
+      </div>
 
-</div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>OPC</th>
+              <th>DNI</th>
+              <th>NOMBRE</th>
+              <th>DIRECCIÓN</th>
+            </tr>
+          </thead>
+          <tbody id="tablaClientes"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-<div class="table-box">
+  <script>
+    // Inicio de sesión y registro
+    function showLogin() {
+      document.querySelector('.login_form').classList.add('visible');
+      document.querySelector('.login_form').classList.remove('hidden');
+      document.querySelector('.register_form').classList.add('hidden');
+      document.querySelector('.register_form').classList.remove('visible');
+      document.getElementById('btn_login_tab').classList.add('active');
+      document.getElementById('btn_register_tab').classList.remove('active');
+    }
 
-<table>
-<thead>
-<tr>
-<th>OPC</th>
-<th>DNI</th>
-<th>NOMBRE</th>
-<th>DIR</th>
-</tr>
-</thead>
+    function showRegister() {
+      document.querySelector('.login_form').classList.add('hidden');
+      document.querySelector('.login_form').classList.remove('visible');
+      document.querySelector('.register_form').classList.add('visible');
+      document.querySelector('.register_form').classList.remove('hidden');
+      document.getElementById('btn_login_tab').classList.remove('active');
+      document.getElementById('btn_register_tab').classList.add('active');
+    }
 
-<tbody id="tablaClientes"></tbody>
+    document.getElementById('btn_login_tab').addEventListener('click', showLogin);
+    document.getElementById('btn_register_tab').addEventListener('click', showRegister);
 
-</table>
-
-</div>
-
-</div>
-
-<script>
-
-let clientes = [
-{dni:"10293847",nombre:"Carlos Mendoza Ruiz",dir:"Av. Los Próceres 123"},
-{dni:"12121212",nombre:"Beatriz Rivas Marín",dir:"Jr. Ayacucho 442"},
-{dni:"143434312",nombre:"julian sanches",dir:"Jr. la libertad 442"},
-];
-
-let editIndex = -1;
-
-function mostrar(){
-    let tabla="";
-    clientes.forEach((c,i)=>{
-        tabla+=`
-        <tr>
-        <td>
-            <button class="edit" onclick="editar(${i})">Edi</button>
-            <button class="delete" onclick="eliminar(${i})">Elim</button>
-        </td>
-        <td>${c.dni}</td>
-        <td>${c.nombre}</td>
-        <td>${c.dir}</td>
-        </tr>
-        `;
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const user = document.getElementById('login_user').value.trim();
+      const pass = document.getElementById('login_pass').value.trim();
+      if (user && pass) {
+        // Simulación de login exitoso
+        document.getElementById('clientsSection').style.display = 'block';
+        document.querySelector('.container').style.display = 'none';
+      } else {
+        alert('Completa usuario y contraseña');
+      }
     });
-    document.getElementById("tablaClientes").innerHTML=tabla;
-}
 
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = document.getElementById('reg_name').value.trim();
+      const email = document.getElementById('reg_email').value.trim();
+      const pass = document.getElementById('reg_pass').value.trim();
+      if (name && email && pass) {
+        // Simulación de registro exitoso
+        alert('Usuario registrado: ' + name);
+        showLogin();
+      } else {
+        alert('Completa todos los campos');
+      }
+    });
 
-function guardar(){
+    // CRUD CLIENTES
+    let clientes = [
+      { dni: '10293847', nombre: 'Carlos Mendoza Ruiz', dir: 'Av. Los Próceres 123' },
+      { dni: '12121212', nombre: 'Beatriz Rivas Marín', dir: 'Jr. Ayacucho 442' },
+      { dni: '143434312', nombre: 'Julian Sanches', dir: 'Jr. La Libertad 442' },
+    ];
 
-    let dni=document.getElementById("dni").value;
-    let nombre=document.getElementById("nombre").value;
-    let dir=document.getElementById("direccion").value;
+    let editIndex = -1;
 
-    if(dni==""||nombre==""||dir==""){
-        alert("Complete datos");
+    function mostrar() {
+      const body = document.getElementById('tablaClientes');
+      let tabla = '';
+      clientes.forEach((c, i) => {
+        tabla += `
+          <tr>
+            <td>
+              <button class="edit" onclick="editar(${i})">Editar</button>
+              <button class="delete" onclick="eliminar(${i})">Eliminar</button>
+            </td>
+            <td>${c.dni}</td>
+            <td>${c.nombre}</td>
+            <td>${c.dir}</td>
+          </tr>
+        `;
+      });
+      body.innerHTML = tabla;
+    }
+
+    function guardar() {
+      const dni = document.getElementById('dni').value.trim();
+      const nombre = document.getElementById('nombre').value.trim();
+      const dir = document.getElementById('direccion').value.trim();
+
+      if (!dni || !nombre || !dir) {
+        alert('Completa todos los datos');
         return;
+      }
+
+      if (editIndex === -1) {
+        // Agregar
+        clientes.push({ dni, nombre, dir });
+      } else {
+        // Editar
+        clientes[editIndex] = { dni, nombre, dir };
+        editIndex = -1;
+      }
+
+      limpiar();
+      mostrar();
     }
 
-    if(editIndex==-1){
-        clientes.push({dni,nombre,dir});
-    }else{
-        clientes[editIndex]={dni,nombre,dir};
-        editIndex=-1;
+    function editar(i) {
+      const c = clientes[i];
+
+      document.getElementById('dni').value = c.dni;
+      document.getElementById('nombre').value = c.nombre;
+      document.getElementById('direccion').value = c.dir;
+
+      editIndex = i;
     }
 
-    limpiar();
-    mostrar();
-}
-
-function editar(i){
-    let c=clientes[i];
-
-    document.getElementById("dni").value=c.dni;
-    document.getElementById("nombre").value=c.nombre;
-    document.getElementById("direccion").value=c.dir;
-
-    editIndex=i;
-}
-
-function eliminar(i){
-    clientes.splice(i,1);
-    mostrar();
-}
-
-function limpiar(){
-    dni.value="";
-    nombre.value="";
-    direccion.value="";
-}
-
-mostrar();
-
-</script>
-
-</body>
-</html>
+    function eliminar(i) {
+      clientes.splice(i, 1
